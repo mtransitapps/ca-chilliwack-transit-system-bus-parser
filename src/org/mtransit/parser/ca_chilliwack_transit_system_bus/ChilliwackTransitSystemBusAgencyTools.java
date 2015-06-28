@@ -18,6 +18,7 @@ import org.mtransit.parser.mt.data.MTrip;
 
 // http://bctransit.com/*/footer/open-data
 // http://bctransit.com/servlet/bctransit/data/GTFS.zip
+// http://bct2.baremetal.com:8080/GoogleTransit/BCTransit/google_transit.zip
 public class ChilliwackTransitSystemBusAgencyTools extends DefaultAgencyTools {
 
 	public static void main(String[] args) {
@@ -41,8 +42,15 @@ public class ChilliwackTransitSystemBusAgencyTools extends DefaultAgencyTools {
 		System.out.printf("Generating Chilliwack Transit System bus data... DONE in %s.\n", Utils.getPrettyDuration(System.currentTimeMillis() - start));
 	}
 
+	private static final String INCLUDE_ONLY_SERVICE_ID_CONTAINS = "CW";
+	private static final String INCLUDE_ONLY_SERVICE_ID_CONTAINS2 = "CHW";
+
 	@Override
 	public boolean excludeCalendar(GCalendar gCalendar) {
+		if (INCLUDE_ONLY_SERVICE_ID_CONTAINS != null && !gCalendar.service_id.contains(INCLUDE_ONLY_SERVICE_ID_CONTAINS)
+				&& INCLUDE_ONLY_SERVICE_ID_CONTAINS2 != null && !gCalendar.service_id.contains(INCLUDE_ONLY_SERVICE_ID_CONTAINS2)) {
+			return true;
+		}
 		if (this.serviceIds != null) {
 			return excludeUselessCalendar(gCalendar, this.serviceIds);
 		}
@@ -51,6 +59,10 @@ public class ChilliwackTransitSystemBusAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public boolean excludeCalendarDate(GCalendarDate gCalendarDates) {
+		if (INCLUDE_ONLY_SERVICE_ID_CONTAINS != null && !gCalendarDates.service_id.contains(INCLUDE_ONLY_SERVICE_ID_CONTAINS)
+				&& INCLUDE_ONLY_SERVICE_ID_CONTAINS2 != null && !gCalendarDates.service_id.contains(INCLUDE_ONLY_SERVICE_ID_CONTAINS2)) {
+			return true;
+		}
 		if (this.serviceIds != null) {
 			return excludeUselessCalendarDate(gCalendarDates, this.serviceIds);
 		}
@@ -69,6 +81,10 @@ public class ChilliwackTransitSystemBusAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public boolean excludeTrip(GTrip gTrip) {
+		if (INCLUDE_ONLY_SERVICE_ID_CONTAINS != null && !gTrip.service_id.contains(INCLUDE_ONLY_SERVICE_ID_CONTAINS)
+				&& INCLUDE_ONLY_SERVICE_ID_CONTAINS2 != null && !gTrip.service_id.contains(INCLUDE_ONLY_SERVICE_ID_CONTAINS2)) {
+			return true;
+		}
 		if (this.serviceIds != null) {
 			return excludeUselessTrip(gTrip, this.serviceIds);
 		}
@@ -131,16 +147,25 @@ public class ChilliwackTransitSystemBusAgencyTools extends DefaultAgencyTools {
 			case 11: return COLOR_FCAF17;
 			// @formatter:on
 			default:
-				return AGENCY_COLOR_BLUE;
+				System.out.println("Unexpected route color " + gRoute);
+				System.exit(-1);
+				return null;
 			}
 		}
 		return super.getRouteColor(gRoute);
 	}
 
 	private static final String EXCHANGE_SHORT = "Ex";
+	private static final String VEDDER_XING = "Vedder Xing";
 
 	@Override
 	public void setTripHeadsign(MRoute mRoute, MTrip mTrip, GTrip gTrip, GSpec gtfs) {
+		if (mRoute.id == 6l) {
+			if (gTrip.direction_id == 0) {
+				mTrip.setHeadsignString(VEDDER_XING, gTrip.direction_id);
+				return;
+			}
+		}
 		mTrip.setHeadsignString(cleanTripHeadsign(gTrip.trip_headsign), gTrip.direction_id);
 	}
 

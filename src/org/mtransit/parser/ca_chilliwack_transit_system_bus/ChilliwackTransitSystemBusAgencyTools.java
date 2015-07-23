@@ -47,8 +47,8 @@ public class ChilliwackTransitSystemBusAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public boolean excludeCalendar(GCalendar gCalendar) {
-		if (INCLUDE_ONLY_SERVICE_ID_CONTAINS != null && !gCalendar.service_id.contains(INCLUDE_ONLY_SERVICE_ID_CONTAINS)
-				&& INCLUDE_ONLY_SERVICE_ID_CONTAINS2 != null && !gCalendar.service_id.contains(INCLUDE_ONLY_SERVICE_ID_CONTAINS2)) {
+		if (INCLUDE_ONLY_SERVICE_ID_CONTAINS != null && !gCalendar.getServiceId().contains(INCLUDE_ONLY_SERVICE_ID_CONTAINS)
+				&& INCLUDE_ONLY_SERVICE_ID_CONTAINS2 != null && !gCalendar.getServiceId().contains(INCLUDE_ONLY_SERVICE_ID_CONTAINS2)) {
 			return true;
 		}
 		if (this.serviceIds != null) {
@@ -59,8 +59,8 @@ public class ChilliwackTransitSystemBusAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public boolean excludeCalendarDate(GCalendarDate gCalendarDates) {
-		if (INCLUDE_ONLY_SERVICE_ID_CONTAINS != null && !gCalendarDates.service_id.contains(INCLUDE_ONLY_SERVICE_ID_CONTAINS)
-				&& INCLUDE_ONLY_SERVICE_ID_CONTAINS2 != null && !gCalendarDates.service_id.contains(INCLUDE_ONLY_SERVICE_ID_CONTAINS2)) {
+		if (INCLUDE_ONLY_SERVICE_ID_CONTAINS != null && !gCalendarDates.getServiceId().contains(INCLUDE_ONLY_SERVICE_ID_CONTAINS)
+				&& INCLUDE_ONLY_SERVICE_ID_CONTAINS2 != null && !gCalendarDates.getServiceId().contains(INCLUDE_ONLY_SERVICE_ID_CONTAINS2)) {
 			return true;
 		}
 		if (this.serviceIds != null) {
@@ -73,7 +73,7 @@ public class ChilliwackTransitSystemBusAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public boolean excludeRoute(GRoute gRoute) {
-		if (!INCLUDE_AGENCY_ID.equals(gRoute.agency_id)) {
+		if (!INCLUDE_AGENCY_ID.equals(gRoute.getAgencyId())) {
 			return true;
 		}
 		return super.excludeRoute(gRoute);
@@ -81,8 +81,8 @@ public class ChilliwackTransitSystemBusAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public boolean excludeTrip(GTrip gTrip) {
-		if (INCLUDE_ONLY_SERVICE_ID_CONTAINS != null && !gTrip.service_id.contains(INCLUDE_ONLY_SERVICE_ID_CONTAINS)
-				&& INCLUDE_ONLY_SERVICE_ID_CONTAINS2 != null && !gTrip.service_id.contains(INCLUDE_ONLY_SERVICE_ID_CONTAINS2)) {
+		if (INCLUDE_ONLY_SERVICE_ID_CONTAINS != null && !gTrip.getServiceId().contains(INCLUDE_ONLY_SERVICE_ID_CONTAINS)
+				&& INCLUDE_ONLY_SERVICE_ID_CONTAINS2 != null && !gTrip.getServiceId().contains(INCLUDE_ONLY_SERVICE_ID_CONTAINS2)) {
 			return true;
 		}
 		if (this.serviceIds != null) {
@@ -98,13 +98,13 @@ public class ChilliwackTransitSystemBusAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public long getRouteId(GRoute gRoute) {
-		return Long.parseLong(gRoute.route_short_name); // use route short name as route ID
+		return Long.parseLong(gRoute.getRouteShortName()); // use route short name as route ID
 	}
 
 	@Override
 	public String getRouteLongName(GRoute gRoute) {
-		String routeLongName = gRoute.route_long_name;
-		routeLongName = CleanUtils.CLEAN_SLASHES.matcher(routeLongName).replaceAll(CleanUtils.CLEAN_SLASHES_REPLACEMENT);
+		String routeLongName = gRoute.getRouteLongName();
+		routeLongName = CleanUtils.cleanSlashes(routeLongName);
 		routeLongName = CleanUtils.cleanNumbers(routeLongName);
 		routeLongName = CleanUtils.cleanStreetTypes(routeLongName);
 		return CleanUtils.cleanLabel(routeLongName);
@@ -131,8 +131,8 @@ public class ChilliwackTransitSystemBusAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public String getRouteColor(GRoute gRoute) {
-		if (StringUtils.isEmpty(gRoute.route_color)) {
-			int rsn = Integer.parseInt(gRoute.route_short_name);
+		if (StringUtils.isEmpty(gRoute.getRouteColor())) {
+			int rsn = Integer.parseInt(gRoute.getRouteShortName());
 			switch (rsn) {
 			// @formatter:off
 			case 1: return COLOR_E21735;
@@ -161,12 +161,12 @@ public class ChilliwackTransitSystemBusAgencyTools extends DefaultAgencyTools {
 	@Override
 	public void setTripHeadsign(MRoute mRoute, MTrip mTrip, GTrip gTrip, GSpec gtfs) {
 		if (mRoute.id == 6l) {
-			if (gTrip.direction_id == 0) {
-				mTrip.setHeadsignString(VEDDER_XING, gTrip.direction_id);
+			if (gTrip.getDirectionId() == 0) {
+				mTrip.setHeadsignString(VEDDER_XING, gTrip.getDirectionId());
 				return;
 			}
 		}
-		mTrip.setHeadsignString(cleanTripHeadsign(gTrip.trip_headsign), gTrip.direction_id);
+		mTrip.setHeadsignString(cleanTripHeadsign(gTrip.getTripHeadsign()), gTrip.getDirectionId());
 	}
 
 	private static final Pattern EXCHANGE = Pattern.compile("(exchange)", Pattern.CASE_INSENSITIVE);

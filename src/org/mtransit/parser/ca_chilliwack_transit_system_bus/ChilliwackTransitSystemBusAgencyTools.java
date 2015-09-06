@@ -194,6 +194,7 @@ public class ChilliwackTransitSystemBusAgencyTools extends DefaultAgencyTools {
 		tripHeadsign = CLEAN_P1.matcher(tripHeadsign).replaceAll(CLEAN_P1_REPLACEMENT);
 		tripHeadsign = CLEAN_P2.matcher(tripHeadsign).replaceAll(CLEAN_P2_REPLACEMENT);
 		tripHeadsign = STARTS_WITH_NUMBER.matcher(tripHeadsign).replaceAll(StringUtils.EMPTY);
+		tripHeadsign = CleanUtils.cleanSlashes(tripHeadsign);
 		tripHeadsign = CleanUtils.cleanStreetTypes(tripHeadsign);
 		return CleanUtils.cleanLabel(tripHeadsign);
 	}

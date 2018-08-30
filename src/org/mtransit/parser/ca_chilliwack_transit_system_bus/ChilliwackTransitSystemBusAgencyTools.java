@@ -126,6 +126,7 @@ public class ChilliwackTransitSystemBusAgencyTools extends DefaultAgencyTools {
 	}
 
 	private static final String AGENCY_COLOR_GREEN = "34B233";// GREEN (from PDF Corporate Graphic Standards)
+	@SuppressWarnings("unused")
 	private static final String AGENCY_COLOR_BLUE = "002C77"; // BLUE (from PDF Corporate Graphic Standards)
 
 	private static final String AGENCY_COLOR = AGENCY_COLOR_GREEN;
@@ -135,38 +136,25 @@ public class ChilliwackTransitSystemBusAgencyTools extends DefaultAgencyTools {
 		return AGENCY_COLOR;
 	}
 
-	private static final String COLOR_E21735 = "E21735";
-	private static final String COLOR_004A8F = "004A8F";
-	private static final String COLOR_7FB539 = "7FB539";
-	private static final String COLOR_F78B1F = "F78B1F";
-	private static final String COLOR_52A6ED = "52A6ED";
-	private static final String COLOR_7C3F24 = "7C3F24";
-	private static final String COLOR_A3238E = "A3238E";
-	private static final String COLOR_49176D = "49176D";
-	private static final String COLOR_4F6F19 = "4F6F19";
-	private static final String COLOR_FCAF17 = "FCAF17";
-
 	@Override
 	public String getRouteColor(GRoute gRoute) {
 		if (StringUtils.isEmpty(gRoute.getRouteColor())) {
 			int rsn = Integer.parseInt(gRoute.getRouteShortName());
 			switch (rsn) {
 			// @formatter:off
-			case 1: return COLOR_E21735;
-			case 2: return COLOR_7FB539;
-			case 3: return COLOR_004A8F;
-			case 4: return COLOR_F78B1F;
-			case 5: return COLOR_52A6ED;
-			case 6: return COLOR_7C3F24;
-			case 7: return COLOR_A3238E;
-			case 8: return COLOR_49176D;
-			case 9: return COLOR_4F6F19;
-			case 11: return COLOR_FCAF17;
+			case 1: return "E21735";
+			case 2: return "7FB539";
+			case 3: return "004A8F";
+			case 4: return "F78B1F";
+			case 5: return "52A6ED";
+			case 6: return "7C3F24";
+			case 7: return "A3238E";
+			case 8: return "49176D";
+			case 9: return "4F6F19";
+			case 11: return "FCAF17";
+			case 22: return "009C3B";
 			// @formatter:on
 			default:
-				if (isGoodEnoughAccepted()) {
-					return AGENCY_COLOR_BLUE;
-				}
 				System.out.printf("\nUnexpected route color for %s!\n", gRoute);
 				System.exit(-1);
 				return null;
@@ -177,11 +165,50 @@ public class ChilliwackTransitSystemBusAgencyTools extends DefaultAgencyTools {
 
 	private static final String EXCHANGE_SHORT = "Exch";
 
-	private static final String VEDDER_XING = "Vedder Xing";
-
 	private static HashMap<Long, RouteTripSpec> ALL_ROUTE_TRIPS2;
 	static {
 		HashMap<Long, RouteTripSpec> map2 = new HashMap<Long, RouteTripSpec>();
+		map2.put(6L, new RouteTripSpec(6L, //
+				0, MTrip.HEADSIGN_TYPE_STRING, "Chilliwack", //
+				1, MTrip.HEADSIGN_TYPE_STRING, "Cultus Lk") //
+				.addTripSort(0, //
+						Arrays.asList(new String[] { //
+						"108248", // Sunnyside at Spruce (NB) #CultusLk
+								"108249", //
+								"108190", // Promontory at Vedder (WB) #Chilliwack
+						})) //
+				.addTripSort(1, //
+						Arrays.asList(new String[] { //
+						"108190", // Promontory at Vedder (WB) #Chilliwack
+								"108085", // ++
+								"108248", // Sunnyside at Spruce (NB) #CultusLk
+						})) //
+				.compileBothTripSort());
+		map2.put(9L, new RouteTripSpec(9L, //
+				0, MTrip.HEADSIGN_TYPE_STRING, "West", //
+				1, MTrip.HEADSIGN_TYPE_STRING, "East") // Downtown
+				.addTripSort(0, //
+						Arrays.asList(new String[] { //
+						"108253", // Downtown Exchange Bay A
+								"108276", // !=
+								"108113", // xx Cottonwood Mall (NB)
+								"124042", // !=
+								"108161", // !=
+								"108114", // !=
+								"108113", // xx Cottonwood Mall (NB)
+						})) //
+				.addTripSort(1, //
+						Arrays.asList(new String[] { //
+						"108113", // xx Cottonwood Mall (NB)
+								"124042", // !=
+								"108161", // !=
+								"108114", // xx
+								"108113", // xx Cottonwood Mall (NB)
+								"108114", // xx
+								"108277", // !=
+								"108253", // Downtown Exchange Bay A
+						})) //
+				.compileBothTripSort());
 		ALL_ROUTE_TRIPS2 = map2;
 	}
 
@@ -214,28 +241,77 @@ public class ChilliwackTransitSystemBusAgencyTools extends DefaultAgencyTools {
 		if (ALL_ROUTE_TRIPS2.containsKey(mRoute.getId())) {
 			return; // split
 		}
-		if (isGoodEnoughAccepted() && mRoute.getId() == 6L) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString(VEDDER_XING, gTrip.getDirectionId());
-				return;
-			}
-		}
-		if (isGoodEnoughAccepted() && mRoute.getId() == 9L && "9 INDUSTRIAL".equals(gTrip.getTripHeadsign())) {
-			if (gTrip.getDirectionId() == 0) {
-				mTrip.setHeadsignString("West", gTrip.getDirectionId()); // PM
-				return;
-			} else if (gTrip.getDirectionId() == 1) {
-				mTrip.setHeadsignString("East", gTrip.getDirectionId()); // AM
-				return;
-			}
-		}
 		mTrip.setHeadsignString(cleanTripHeadsign(gTrip.getTripHeadsign()), gTrip.getDirectionId());
 	}
 
 	@Override
 	public boolean mergeHeadsign(MTrip mTrip, MTrip mTripToMerge) {
 		List<String> headsignsValues = Arrays.asList(mTrip.getHeadsignValue(), mTripToMerge.getHeadsignValue());
-		if (mTrip.getRouteId() == 11L) {
+		if (mTrip.getRouteId() == 1L) {
+			if (Arrays.asList( //
+					"Vedder", //
+					"Ufv" //
+			).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString("Ufv", mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 2L) {
+			if (Arrays.asList( //
+					"Chilliwack", //
+					"Downtown" //
+			).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString("Downtown", mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 3L) {
+			if (Arrays.asList( //
+					"Downtown", //
+					"Chilliwack" //
+			).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString("Chilliwack", mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 4L) {
+			if (Arrays.asList( //
+					"Mall", // <>
+					"Malls" // <>
+			).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString("Malls", mTrip.getHeadsignId());
+				return true;
+			}
+			if (Arrays.asList( //
+					"Mall", // <>
+					"Malls", // <>
+					"Promontory", //
+					"Teskey / Sylvan" //
+			).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString("Teskey / Sylvan", mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 7L) {
+			if (Arrays.asList( //
+					"Chilliwack", //
+					"Downtown" //
+			).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString("Downtown", mTrip.getHeadsignId());
+				return true;
+			}
+			if (Arrays.asList( //
+					"Mall", //
+					"Malls" //
+			).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString("Malls", mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 8L) {
+			if (Arrays.asList( //
+					"Tyson", //
+					"UFV / Mall" //
+			).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString("UFV / Mall", mTrip.getHeadsignId());
+				return true;
+			}
+		} else if (mTrip.getRouteId() == 11L) {
 			if (Arrays.asList( //
 					"Agassiz", //
 					"Harrison Hot Spgs" //
@@ -243,9 +319,6 @@ public class ChilliwackTransitSystemBusAgencyTools extends DefaultAgencyTools {
 				mTrip.setHeadsignString("Harrison Hot Spgs", mTrip.getHeadsignId());
 				return true;
 			}
-		}
-		if (isGoodEnoughAccepted()) {
-			return super.mergeHeadsign(mTrip, mTripToMerge);
 		}
 		System.out.printf("\nUnexpected trips to merge %s & %s!\n", mTrip, mTripToMerge);
 		System.exit(-1);

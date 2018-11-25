@@ -27,8 +27,8 @@ import org.mtransit.parser.mt.data.MRoute;
 import org.mtransit.parser.mt.data.MTrip;
 import org.mtransit.parser.mt.data.MTripStop;
 
-// https://bctransit.com/*/footer/open-data
-// https://bctransit.com/servlet/bctransit/data/GTFS - Chilliwack
+// https://www.bctransit.com/open-data
+// https://www.bctransit.com/data/gtfs/internet/CHW-1809_20181023-20190629_v200181031.zip
 public class ChilliwackTransitSystemBusAgencyTools extends DefaultAgencyTools {
 
 	public static void main(String[] args) {

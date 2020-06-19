@@ -314,9 +314,10 @@ public class ChilliwackTransitSystemBusAgencyTools extends DefaultAgencyTools {
 		} else if (mTrip.getRouteId() == 11L) {
 			if (Arrays.asList( //
 					"Agassiz", //
-					"Harrison Hot Spgs" //
+					"Harrison Hot Spgs", //
+					"Harrison" //
 			).containsAll(headsignsValues)) {
-				mTrip.setHeadsignString("Harrison Hot Spgs", mTrip.getHeadsignId());
+				mTrip.setHeadsignString("Harrison", mTrip.getHeadsignId());
 				return true;
 			}
 		}
@@ -330,12 +331,6 @@ public class ChilliwackTransitSystemBusAgencyTools extends DefaultAgencyTools {
 
 	private static final Pattern STARTS_WITH_NUMBER = Pattern.compile("(^[\\d]+[\\S]*)", Pattern.CASE_INSENSITIVE);
 
-	private static final Pattern ENDS_WITH_VIA = Pattern.compile("( via .*$)", Pattern.CASE_INSENSITIVE);
-	private static final Pattern STARTS_WITH_TO = Pattern.compile("(^.* to )", Pattern.CASE_INSENSITIVE);
-
-	private static final Pattern AND = Pattern.compile("( and )", Pattern.CASE_INSENSITIVE);
-	private static final String AND_REPLACEMENT = " & ";
-
 	private static final Pattern CLEAN_P1 = Pattern.compile("[\\s]*\\([\\s]*");
 	private static final String CLEAN_P1_REPLACEMENT = " (";
 	private static final Pattern CLEAN_P2 = Pattern.compile("[\\s]*\\)[\\s]*");
@@ -347,9 +342,8 @@ public class ChilliwackTransitSystemBusAgencyTools extends DefaultAgencyTools {
 			tripHeadsign = tripHeadsign.toLowerCase(Locale.ENGLISH);
 		}
 		tripHeadsign = EXCHANGE.matcher(tripHeadsign).replaceAll(EXCHANGE_REPLACEMENT);
-		tripHeadsign = ENDS_WITH_VIA.matcher(tripHeadsign).replaceAll(StringUtils.EMPTY);
-		tripHeadsign = STARTS_WITH_TO.matcher(tripHeadsign).replaceAll(StringUtils.EMPTY);
-		tripHeadsign = AND.matcher(tripHeadsign).replaceAll(AND_REPLACEMENT);
+		tripHeadsign = CleanUtils.keepToAndRemoveVia(tripHeadsign);
+		tripHeadsign = CleanUtils.CLEAN_AND.matcher(tripHeadsign).replaceAll(CleanUtils.CLEAN_AND_REPLACEMENT);
 		tripHeadsign = CLEAN_P1.matcher(tripHeadsign).replaceAll(CLEAN_P1_REPLACEMENT);
 		tripHeadsign = CLEAN_P2.matcher(tripHeadsign).replaceAll(CLEAN_P2_REPLACEMENT);
 		tripHeadsign = STARTS_WITH_NUMBER.matcher(tripHeadsign).replaceAll(StringUtils.EMPTY);
@@ -358,13 +352,12 @@ public class ChilliwackTransitSystemBusAgencyTools extends DefaultAgencyTools {
 		return CleanUtils.cleanLabel(tripHeadsign);
 	}
 
-	private static final Pattern STARTS_WITH_BOUND = Pattern.compile("(^(east|west|north|south)bound)", Pattern.CASE_INSENSITIVE);
 	private static final Pattern STARTS_WITH_IMPL = Pattern.compile("(^(\\(\\-IMPL\\-\\)))", Pattern.CASE_INSENSITIVE);
 
 	@Override
 	public String cleanStopName(String gStopName) {
 		gStopName = STARTS_WITH_IMPL.matcher(gStopName).replaceAll(StringUtils.EMPTY);
-		gStopName = STARTS_WITH_BOUND.matcher(gStopName).replaceAll(StringUtils.EMPTY);
+		gStopName = CleanUtils.cleanBounds(gStopName);
 		gStopName = CleanUtils.CLEAN_AT.matcher(gStopName).replaceAll(CleanUtils.CLEAN_AT_REPLACEMENT);
 		gStopName = EXCHANGE.matcher(gStopName).replaceAll(EXCHANGE_REPLACEMENT);
 		gStopName = CleanUtils.cleanStreetTypes(gStopName);

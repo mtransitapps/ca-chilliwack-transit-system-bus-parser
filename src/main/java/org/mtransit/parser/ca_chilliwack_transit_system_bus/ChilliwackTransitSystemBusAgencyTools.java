@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.mtransit.parser.CleanUtils;
 import org.mtransit.parser.DefaultAgencyTools;
+import org.mtransit.parser.MTLog;
 import org.mtransit.parser.Pair;
 import org.mtransit.parser.SplitUtils;
 import org.mtransit.parser.SplitUtils.RouteTripSpec;
@@ -45,11 +46,11 @@ public class ChilliwackTransitSystemBusAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public void start(String[] args) {
-		System.out.printf("\nGenerating Chilliwack Transit System bus data...");
+		MTLog.log("Generating Chilliwack Transit System bus data...");
 		long start = System.currentTimeMillis();
 		this.serviceIds = extractUsefulServiceIds(args, this, true);
 		super.start(args);
-		System.out.printf("\nGenerating Chilliwack Transit System bus data... DONE in %s.\n", Utils.getPrettyDuration(System.currentTimeMillis() - start));
+		MTLog.log("Generating Chilliwack Transit System bus data... DONE in %s.", Utils.getPrettyDuration(System.currentTimeMillis() - start));
 	}
 
 	@Override
@@ -155,9 +156,7 @@ public class ChilliwackTransitSystemBusAgencyTools extends DefaultAgencyTools {
 			case 22: return "009C3B";
 			// @formatter:on
 			default:
-				System.out.printf("\nUnexpected route color for %s!\n", gRoute);
-				System.exit(-1);
-				return null;
+				throw new MTLog.Fatal("Unexpected route color for %s!", gRoute);
 			}
 		}
 		return super.getRouteColor(gRoute);
@@ -320,10 +319,23 @@ public class ChilliwackTransitSystemBusAgencyTools extends DefaultAgencyTools {
 				mTrip.setHeadsignString("Harrison", mTrip.getHeadsignId());
 				return true;
 			}
+		} else if (mTrip.getRouteId() == 22L) {
+			if (Arrays.asList( //
+					"South", //
+					"Agassiz" //
+			).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString("Agassiz", mTrip.getHeadsignId());
+				return true;
+			}
+			if (Arrays.asList( //
+					"North", //
+					"Hope" //
+			).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString("Hope", mTrip.getHeadsignId());
+				return true;
+			}
 		}
-		System.out.printf("\nUnexpected trips to merge %s & %s!\n", mTrip, mTripToMerge);
-		System.exit(-1);
-		return false;
+		throw new MTLog.Fatal("Unexpected trips to merge %s & %s!", mTrip, mTripToMerge);
 	}
 
 	private static final Pattern EXCHANGE = Pattern.compile("(exchange)", Pattern.CASE_INSENSITIVE);

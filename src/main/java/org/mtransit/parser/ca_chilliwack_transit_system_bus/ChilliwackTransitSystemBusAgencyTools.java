@@ -72,7 +72,7 @@ public class ChilliwackTransitSystemBusAgencyTools extends DefaultAgencyTools {
 	}
 
 	private static final String AGENCY_COLOR_GREEN = "34B233";// GREEN (from PDF Corporate Graphic Standards)
-	// private static final String AGENCY_COLOR_BLUE = "002C77"; // BLUE (from PDF Corporate Graphic Standards)
+	private static final String AGENCY_COLOR_BLUE = "002C77"; // BLUE (from PDF Corporate Graphic Standards)
 
 	private static final String AGENCY_COLOR = AGENCY_COLOR_GREEN;
 
@@ -84,28 +84,36 @@ public class ChilliwackTransitSystemBusAgencyTools extends DefaultAgencyTools {
 
 	@Nullable
 	@Override
-	public String getRouteColor(@NotNull GRoute gRoute, @NotNull MAgency agency) {
-		if (StringUtils.isEmpty(gRoute.getRouteColor())) {
-			final int rsn = Integer.parseInt(gRoute.getRouteShortName());
-			switch (rsn) {
-			// @formatter:off
-			case 1: return "E21735";
-			case 2: return "7FB539";
-			case 3: return "004A8F";
-			case 4: return "F78B1F";
-			case 5: return "52A6ED";
-			case 6: return "7C3F24";
-			case 7: return "A3238E";
-			case 8: return "49176D";
-			case 9: return "4F6F19";
-			case 11: return "FCAF17";
-			case 22: return "009C3B";
-			// @formatter:on
-			default:
-				throw new MTLog.Fatal("Unexpected route color for %s!", gRoute);
-			}
+	public String provideMissingRouteColor(@NotNull GRoute gRoute) {
+		switch (gRoute.getRouteShortName()) {
+		// @formatter:off
+		case "1": return "E21735";
+		case "2": return "7FB539";
+		case "3": return "004A8F";
+		case "4": return "F78B1F";
+		case "5": return "52A6ED";
+		case "6": return "7C3F24";
+		case "7": return "A3238E";
+		case "8": return "49176D";
+		case "9": return "4F6F19";
+		case "11": return "FCAF17";
+		case "22": return "009C3B";
+		case "51": return "E51535";
+		case "52": return "80CC28";
+		case "53": return "61849C";
+		case "54": return "F68712";
+		case "55": return "00ADEF";
+		case "56": return "75321E";
+		case "57": return "A32B9B";
+		case "58": return "401A64";
+		case "59": return "49690F";
+		case "66": return AGENCY_COLOR_BLUE;
+		case "71": return "FBBD09";
+		case "72": return "11AB4A";
+		// @formatter:on
+		default:
+			throw new MTLog.Fatal("Unexpected missing route color for %s!", gRoute);
 		}
-		return super.getRouteColor(gRoute, agency);
 	}
 
 	@Override

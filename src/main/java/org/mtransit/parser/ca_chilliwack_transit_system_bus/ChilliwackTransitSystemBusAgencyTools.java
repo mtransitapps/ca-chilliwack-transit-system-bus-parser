@@ -4,6 +4,7 @@ import static org.mtransit.commons.StringUtils.EMPTY;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.mtransit.commons.CharUtils;
 import org.mtransit.commons.CleanUtils;
 import org.mtransit.parser.DefaultAgencyTools;
 import org.mtransit.parser.MTLog;
@@ -30,9 +31,11 @@ public class ChilliwackTransitSystemBusAgencyTools extends DefaultAgencyTools {
 		if (gRoute.getRouteLongNameOrDefault().contains("FVX")) {
 			return EXCLUDE; // available in Fraser Valley Express app
 		}
-		final int rsn = Integer.parseInt(gRoute.getRouteShortName());
-		if (rsn < 50) {
-			return EXCLUDE; // available in Central Fraser Valley app
+		if (CharUtils.isDigitsOnly(gRoute.getRouteShortName())) {
+			final int rsn = Integer.parseInt(gRoute.getRouteShortName());
+			if (rsn < 50) {
+				return EXCLUDE; // available in Central Fraser Valley app
+			}
 		}
 		return super.excludeRoute(gRoute);
 	}
@@ -57,6 +60,15 @@ public class ChilliwackTransitSystemBusAgencyTools extends DefaultAgencyTools {
 	@Override
 	public boolean useRouteShortNameForRouteId() {
 		return true;
+	}
+
+	@Override
+	public @Nullable Long convertRouteIdFromShortNameNotSupported(@NotNull String routeShortName) {
+		switch (routeShortName) {
+		case "FAIR":
+			return 1_001L;
+		}
+		return super.convertRouteIdFromShortNameNotSupported(routeShortName);
 	}
 
 	@NotNull

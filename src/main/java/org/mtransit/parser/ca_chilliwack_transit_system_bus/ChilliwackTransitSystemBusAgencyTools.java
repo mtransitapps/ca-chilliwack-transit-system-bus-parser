@@ -15,6 +15,8 @@ import java.util.Locale;
 import java.util.regex.Pattern;
 
 // https://www.bctransit.com/open-data
+// The Fraser Valley Region consists of:
+// Agassiz-Harrison, Central Fraser Valley, Chilliwack, Fraser Valley Express and Hope.
 public class ChilliwackTransitSystemBusAgencyTools extends DefaultAgencyTools {
 
 	public static void main(@NotNull String[] args) {
@@ -59,7 +61,12 @@ public class ChilliwackTransitSystemBusAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public boolean useRouteShortNameForRouteId() {
-		return true;
+		return false; // route ID used by GTFS RT
+	}
+
+	@Override
+	public @Nullable String getRouteIdCleanupRegex() {
+		return "\\-[A-Z]+$";
 	}
 
 	@Override
